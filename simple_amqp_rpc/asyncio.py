@@ -3,6 +3,7 @@ from asyncio import Future, wait_for
 
 from simple_amqp import AmqpMsg, AmqpParameters
 from simple_amqp.asyncio import AsyncioAmqpConnection
+
 from simple_amqp_rpc import RpcCall, RpcResp
 from simple_amqp_rpc.base import BaseAmqpRpc
 from simple_amqp_rpc.consts import (
@@ -16,14 +17,16 @@ from simple_amqp_rpc.consts import (
 class AsyncioAmqpRpc(BaseAmqpRpc):
     def __init__(
             self,
-            params: AmqpParameters,
+            params: AmqpParameters = None,
             route: str='service.name',
             call_timeout: int=RPC_CALL_TIMEOUT,
+            conn: AsyncioAmqpConnection = None,
     ):
         super().__init__(
             params=params,
             route=route,
             call_timeout=call_timeout,
+            conn=conn,
         )
         self._response_futures = {}
 

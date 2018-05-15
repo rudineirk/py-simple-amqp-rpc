@@ -1,7 +1,8 @@
 from abc import ABCMeta
 from uuid import uuid4
 
-from simple_amqp import AmqpMsg, AmqpParameters
+from simple_amqp import AmqpConnection, AmqpMsg, AmqpParameters
+
 from simple_amqp_rpc.consts import (
     REPLY_ID,
     RPC_CALL_TIMEOUT,
@@ -27,14 +28,18 @@ class BaseAmqpRpc(BaseRpc, metaclass=ABCMeta):
 
     def __init__(
             self,
-            params: AmqpParameters,
+            params: AmqpParameters = None,
             route: str='service.name',
             call_timeout: int=RPC_CALL_TIMEOUT,
+            conn: AmqpConnection = None,
     ):
         super().__init__()
         self.route = route
         self._call_timeout = call_timeout
-        self.conn = self._create_conn(params)
+        if conn is not None:
+            self.conn = conn
+        else:
+            self.conn = self._create_conn(params)
 
         self._rpc_call_channel = None
         self._rpc_resp_channel = None
