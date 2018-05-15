@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "5663afcee39f61f427c5ee119eb325ace03e9b97433884a4770827f946b75996"
+            "sha256": "0c7131d517d00f0df372a26c9e95e09572c598c5bd2e57faca38a2c70cdacab4"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -21,8 +21,14 @@
                 "sha256:63131aaeec48a6c8f1db1fe657e1e74cf384c3927eb7d1725e31edae4220dea4",
                 "sha256:7277b4d12a99efa4058782614d84138983f9f89d690bdfcea66290d810806459"
             ],
-            "index": "pypi",
             "version": "==0.10.0"
+        },
+        "simple-amqp": {
+            "hashes": [
+                "sha256:f9c58080d1a5350c6c612262bf982ece79567e3b9bcbf05a67209af2166cbc72"
+            ],
+            "index": "pypi",
+            "version": "==0.0.2"
         }
     },
     "develop": {
@@ -249,7 +255,6 @@
                 "sha256:63131aaeec48a6c8f1db1fe657e1e74cf384c3927eb7d1725e31edae4220dea4",
                 "sha256:7277b4d12a99efa4058782614d84138983f9f89d690bdfcea66290d810806459"
             ],
-            "index": "pypi",
             "version": "==0.10.0"
         },
         "pkginfo": {
