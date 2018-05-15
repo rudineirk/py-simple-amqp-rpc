@@ -3,6 +3,7 @@ from typing import Callable, Tuple
 
 from simple_amqp_rpc.consts import METHOD_NOT_FOUND, SERVICE_NOT_FOUND
 from simple_amqp_rpc.data import RpcCall, RpcResp
+from simple_amqp_rpc.service import Service
 
 from .client import RpcClient
 
@@ -25,9 +26,9 @@ class BaseRpc(metaclass=ABCMeta):
 
         return decorator
 
-    def add_svc(self, service) -> 'BaseRpc':
-        service_name = service.svc.name
-        methods = service.svc.get_methods(service)
+    def add_svc(self, svc: Service, servicer) -> 'BaseRpc':
+        service_name = svc.name
+        methods = svc.get_methods(servicer)
 
         if service_name not in self._services:
             self._services[service_name] = {}

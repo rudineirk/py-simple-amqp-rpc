@@ -24,7 +24,7 @@ class PingService:
 ping_service = PingService()
 
 rpc_conn \
-    .add_svc(ping_service)
+    .add_svc(ping_service.svc, ping_service)
 
 rpc_conn.configure()
 rpc_conn.start()

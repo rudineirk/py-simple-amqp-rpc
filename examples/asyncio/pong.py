@@ -1,9 +1,9 @@
 import timeit
 from asyncio import get_event_loop, set_event_loop_policy
 
+import uvloop
 from simple_amqp import AmqpParameters
 
-import uvloop
 from simple_amqp_rpc import Service
 from simple_amqp_rpc.asyncio import AsyncioAmqpRpc
 
@@ -31,7 +31,7 @@ class PongService:
 
 pong_service = PongService()
 rpc_conn \
-    .add_svc(pong_service)
+    .add_svc(pong_service.svc, pong_service)
 
 rpc_conn.configure()
 

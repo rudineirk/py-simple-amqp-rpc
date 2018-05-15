@@ -31,7 +31,7 @@ class PongService:
 pong_service = PongService()
 
 rpc_conn \
-    .add_svc(pong_service)
+    .add_svc(pong_service.svc, pong_service)
 
 rpc_conn.configure()
 rpc_conn.start()
