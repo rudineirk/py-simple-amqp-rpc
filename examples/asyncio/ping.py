@@ -1,8 +1,8 @@
 from asyncio import get_event_loop, set_event_loop_policy, sleep
 
-import uvloop
-
 from simple_amqp import AmqpParameters
+
+import uvloop
 from simple_amqp_rpc import Service
 from simple_amqp_rpc.asyncio import AsyncioAmqpRpc
 
@@ -18,8 +18,8 @@ class PingService:
 
 
 rpc_conn = AsyncioAmqpRpc(
-    AmqpParameters(),
-    'ping',
+    params=AmqpParameters(),
+    route='ping',
 )
 
 ping_service = PingService()

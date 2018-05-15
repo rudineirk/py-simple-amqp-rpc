@@ -1,6 +1,6 @@
-import msgpack
-
 from simple_amqp import AmqpMsg
+
+import msgpack
 
 from .consts import RPC_MESSAGE_TTL
 from .data import RpcCall, RpcResp

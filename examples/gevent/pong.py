@@ -4,12 +4,13 @@ monkey.patch_all()  # isort:skip
 import timeit  # noqa: E402
 
 from simple_amqp import AmqpParameters  # noqa: E402
+
 from simple_amqp_rpc import Service  # noqa: E402
 from simple_amqp_rpc.gevent import GeventAmqpRpc  # noqa: E402
 
 rpc_conn = GeventAmqpRpc(
-    AmqpParameters(),
-    'pong',
+    params=AmqpParameters(),
+    route='pong',
 )
 
 PingClient = rpc_conn.client('ping', 'ping')

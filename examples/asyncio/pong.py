@@ -1,17 +1,17 @@
 import timeit
 from asyncio import get_event_loop, set_event_loop_policy
 
-import uvloop
-
 from simple_amqp import AmqpParameters
+
+import uvloop
 from simple_amqp_rpc import Service
 from simple_amqp_rpc.asyncio import AsyncioAmqpRpc
 
 set_event_loop_policy(uvloop.EventLoopPolicy())
 
 rpc_conn = AsyncioAmqpRpc(
-    AmqpParameters(),
-    'pong',
+    params=AmqpParameters(),
+    route='pong',
 )
 
 PingClient = rpc_conn.client('ping', 'ping')

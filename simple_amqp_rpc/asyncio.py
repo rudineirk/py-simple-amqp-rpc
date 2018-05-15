@@ -17,16 +17,16 @@ from simple_amqp_rpc.consts import (
 class AsyncioAmqpRpc(BaseAmqpRpc):
     def __init__(
             self,
+            conn: AsyncioAmqpConnection = None,
             params: AmqpParameters = None,
             route: str='service.name',
             call_timeout: int=RPC_CALL_TIMEOUT,
-            conn: AsyncioAmqpConnection = None,
     ):
         super().__init__(
+            conn=conn,
             params=params,
             route=route,
             call_timeout=call_timeout,
-            conn=conn,
         )
         self._response_futures = {}
 

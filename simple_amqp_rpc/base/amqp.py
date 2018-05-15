@@ -28,10 +28,10 @@ class BaseAmqpRpc(BaseRpc, metaclass=ABCMeta):
 
     def __init__(
             self,
+            conn: AmqpConnection = None,
             params: AmqpParameters = None,
             route: str='service.name',
             call_timeout: int=RPC_CALL_TIMEOUT,
-            conn: AmqpConnection = None,
     ):
         super().__init__()
         self.route = route
