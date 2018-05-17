@@ -26,7 +26,7 @@ setup(
         'Programming Language :: Python :: 3.6',
     ],
     keywords='simple amqp rpc',
-    packages=['simple_amqp_rpc'],
+    packages=['simple_amqp_rpc', 'simple_amqp_rpc.base'],
     install_requires=[
         'simple_amqp',
         'msgpack',
