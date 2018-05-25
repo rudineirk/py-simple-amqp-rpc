@@ -1,9 +1,9 @@
 import traceback
 
 from gevent.event import AsyncResult
+
 from simple_amqp import AmqpMsg, AmqpParameters
 from simple_amqp.gevent import GeventAmqpConnection
-
 from simple_amqp_rpc import RpcCall, RpcResp
 from simple_amqp_rpc.base import BaseAmqpRpc
 from simple_amqp_rpc.consts import (
@@ -21,12 +21,14 @@ class GeventAmqpRpc(BaseAmqpRpc):
             params: AmqpParameters = None,
             route: str='service.name',
             call_timeout: int=RPC_CALL_TIMEOUT,
+            logger=None,
     ):
         super().__init__(
             conn=conn,
             params=params,
             route=route,
             call_timeout=call_timeout,
+            logger=None,
         )
         self._response_futures = {}
 

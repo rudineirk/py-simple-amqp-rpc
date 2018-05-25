@@ -3,17 +3,17 @@ from typing import Callable, Tuple
 
 from simple_amqp_rpc.consts import METHOD_NOT_FOUND, SERVICE_NOT_FOUND
 from simple_amqp_rpc.data import RpcCall, RpcResp
-from simple_amqp_rpc.log import logger
+from simple_amqp_rpc.log import setup_logger
 from simple_amqp_rpc.service import Service
 
 from .client import RpcClient
 
 
 class BaseRpc(metaclass=ABCMeta):
-    def __init__(self):
+    def __init__(self, logger=None):
         self._services = {}
         self._recv_error_handlers = set()
-        self.log = logger
+        self.log = logger if logger is not None else setup_logger()
 
     def method(self, service: str, name: str=None):
         if service not in self._services:
