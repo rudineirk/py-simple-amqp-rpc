@@ -40,6 +40,7 @@ class AsyncioAmqpRpc(BaseAmqpRpc):
         return AsyncioAmqpConnection(params)
 
     async def recv_call(self, call: RpcCall) -> RpcResp:
+        self.log_call_recv(call)
         method, error = self._get_method(call.service, call.method)
         if error:
             return error

@@ -66,6 +66,7 @@ class BaseAmqpRpc(BaseRpc, metaclass=ABCMeta):
         return self.CLIENT_CLS(self, service, route)
 
     def send_call(self, call: RpcCall, timeout=RPC_CALL_TIMEOUT) -> RpcResp:
+        self.log_call_sent(call)
         if timeout is None or timeout == -1:
             timeout = self._call_timeout
 
