@@ -2,6 +2,7 @@ from abc import ABCMeta
 from uuid import uuid4
 
 from simple_amqp import AmqpConnection, AmqpMsg, AmqpParameters
+
 from simple_amqp_rpc.consts import (
     REPLY_ID,
     RPC_CALL_TIMEOUT,
@@ -41,6 +42,11 @@ class BaseAmqpRpc(BaseRpc, metaclass=ABCMeta):
         else:
             self.conn = self._create_conn(params)
 
+        self.stage_setup_name = '3:rpc.setup'
+        self._stage_setup = None
+        self.stage_listen_name = '5:rpc.listen'
+        self._stage_listen = None
+
         self._rpc_call_channel = None
         self._rpc_resp_channel = None
         self._publish_routes = set()
@@ -51,6 +57,7 @@ class BaseAmqpRpc(BaseRpc, metaclass=ABCMeta):
         raise NotImplementedError
 
     def configure(self):
+        self._configure_stages()
         self._create_publish()
         self._create_listen()
         self._create_resp()
@@ -110,11 +117,20 @@ class BaseAmqpRpc(BaseRpc, metaclass=ABCMeta):
     def _encode_resp(self, resp: RpcResp) -> AmqpMsg:
         return encode_rpc_resp(resp)
 
+    def _configure_stages(self):
+        self._stage_setup = self.conn.stage(self.stage_setup_name)
+        self._stage_listen = self.conn.stage(self.stage_listen_name)
+
     def _create_publish(self):
-        channel = self.conn.channel()
+        channel = self.conn.channel(stage=self._stage_setup)
         for route in self._publish_routes:
             exchange = RPC_EXCHANGE.format(route=route)
-            channel.exchange(exchange, 'topic', durable=True)
+            channel.exchange(
+                exchange,
+                'topic',
+                durable=True,
+                stage=self._stage_setup,
+            )
 
         self._rpc_call_channel = channel
 
@@ -122,21 +138,42 @@ class BaseAmqpRpc(BaseRpc, metaclass=ABCMeta):
         exchange_name = RPC_EXCHANGE.format(route=self.route)
         queue_name = RPC_QUEUE.format(route=self.route)
 
-        channel = self.conn.channel()
+        channel = self.conn.channel(stage=self._stage_setup)
         exchange = channel \
-            .exchange(exchange_name, 'topic', durable=True)
+            .exchange(
+                exchange_name,
+                'topic',
+                durable=True,
+                stage=self._stage_setup,
+            )
         channel \
-            .queue(queue_name, auto_delete=True) \
-            .bind(exchange, RPC_TOPIC) \
-            .consume(self._on_call_message)
+            .queue(
+                queue_name,
+                auto_delete=True,
+                stage=self._stage_setup,
+            ) \
+            .bind(
+                exchange,
+                RPC_TOPIC,
+                stage=self._stage_setup,
+            ) \
+            .consume(
+                self._on_call_message,
+                stage=self._stage_listen,
+            )
 
     def _create_resp(self):
         channel = self.conn.channel()
-        queue = channel.queue(auto_delete=True, exclusive=True)
+        queue = channel.queue(
+            auto_delete=True,
+            exclusive=True,
+            stage=self._stage_setup,
+        )
         queue.consume(
             self._on_resp_message,
             auto_ack=True,
             exclusive=True,
+            stage=self._stage_setup,
         )
         self._resp_channel = channel
         self._resp_queue = queue.name

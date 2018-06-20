@@ -3,6 +3,7 @@ from asyncio import Future, wait_for
 
 from simple_amqp import AmqpMsg, AmqpParameters
 from simple_amqp.asyncio import AsyncioAmqpConnection
+
 from simple_amqp_rpc import RpcCall, RpcResp
 from simple_amqp_rpc.base import BaseAmqpRpc
 from simple_amqp_rpc.consts import (
@@ -33,6 +34,8 @@ class AsyncioAmqpRpc(BaseAmqpRpc):
 
     async def start(self, auto_reconnect: bool=True, wait: bool=True):
         await self.conn.start(auto_reconnect, wait)
+        for _ in self.conn.stages[1:]:
+            await self.conn.next_stage()
 
     async def stop(self):
         await self.conn.stop()

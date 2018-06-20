@@ -1,9 +1,9 @@
 import traceback
 
 from gevent.event import AsyncResult
-
 from simple_amqp import AmqpMsg, AmqpParameters
 from simple_amqp.gevent import GeventAmqpConnection
+
 from simple_amqp_rpc import RpcCall, RpcResp
 from simple_amqp_rpc.base import BaseAmqpRpc
 from simple_amqp_rpc.consts import (
@@ -34,6 +34,8 @@ class GeventAmqpRpc(BaseAmqpRpc):
 
     def start(self, auto_reconnect: bool=True, wait: bool=True):
         self.conn.start(auto_reconnect, wait)
+        for _ in self.conn.stages[1:]:
+            self.conn.next_stage()
 
     def stop(self):
         self.conn.stop()
