@@ -29,7 +29,7 @@ setup(
     keywords='simple amqp rpc',
     packages=['simple_amqp_rpc', 'simple_amqp_rpc.base'],
     install_requires=[
-        'simple_amqp>=0.2.1',
+        'simple_amqp>=0.2.3',
         'msgpack',
     ],
     extras_require={
