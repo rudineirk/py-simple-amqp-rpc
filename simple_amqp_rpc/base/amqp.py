@@ -42,6 +42,14 @@ class BaseAmqpRpc(BaseRpc, metaclass=ABCMeta):
         else:
             self.conn = self._create_conn(params)
 
+        self._call_encoders = {'json': encode_rpc_call}
+        self._call_decoders = {'json': decode_rpc_call}
+        self._resp_encoders = {'json': encode_rpc_resp}
+        self._resp_decoders = {'json': decode_rpc_resp}
+
+        self._default_encoding = 'json'
+        self._route_encodings = {}
+
         self.stage_setup_name = '1:rpc.setup'
         self._stage_setup = None
         self.stage_listen_name = '2:rpc.listen'
@@ -86,7 +94,25 @@ class BaseAmqpRpc(BaseRpc, metaclass=ABCMeta):
             reply_to=self._resp_queue,
             correlation_id=reply_id,
         )
-        return self._send_call_msg(reply_id, timeout, msg)
+        return self._send_call_msg(reply_id, timeout, msg, call.route)
+
+    def set_route_encoding(self, route: str, encoding: str):
+        self._route_encodings[route] = encoding
+
+    def set_default_encoding(self, encoding: str):
+        self._default_encoding = encoding
+
+    def set_call_encoder(self, name: str, call_encoder):
+        self._call_encoders[name] = call_encoder
+
+    def set_call_decoder(self, name: str, call_decoder):
+        self._call_decoders[name] = call_decoder
+
+    def set_resp_encoder(self, name: str, resp_encoder):
+        self._resp_encoder[name] = resp_encoder
+
+    def set_resp_decoder(self, name: str, resp_decoder):
+        self._resp_decoder[name] = resp_decoder
 
     def _send_call_msg(
             self,
@@ -105,17 +131,28 @@ class BaseAmqpRpc(BaseRpc, metaclass=ABCMeta):
     def _create_reply_id(self) -> str:
         return self.REPLY_ID.format(id=str(uuid4()))
 
+    def _get_encoding(self, route: str):
+        return self._route_encodings.get(route, self._default_encoding)
+
     def _decode_call(self, msg: AmqpMsg) -> RpcCall:
-        return decode_rpc_call(msg, self.route)
+        encoding = self._get_encoding(self.route)
+        decoder = self._call_decoders[encoding]
+        return decoder(msg, self.route)
 
     def _encode_call(self, call: RpcCall) -> AmqpMsg:
-        return encode_rpc_call(call)
+        encoding = self._get_encoding(call.route)
+        encoder = self._call_encoders[encoding]
+        return encoder(call)
 
-    def _decode_resp(self, msg: AmqpMsg) -> RpcResp:
-        return decode_rpc_resp(msg)
+    def _decode_resp(self, msg: AmqpMsg, route: str) -> RpcResp:
+        encoding = self._get_encoding(route)
+        decoder = self._resp_decoders[encoding]
+        return decoder(msg, route)
 
     def _encode_resp(self, resp: RpcResp) -> AmqpMsg:
-        return encode_rpc_resp(resp)
+        encoding = self._get_encoding(self.route)
+        encoder = self._resp_encoders[encoding]
+        return encoder(resp)
 
     def _configure_stages(self):
         self._stage_setup = self.conn.stage(self.stage_setup_name)

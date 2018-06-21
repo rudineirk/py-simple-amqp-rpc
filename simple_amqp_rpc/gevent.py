@@ -78,10 +78,11 @@ class GeventAmqpRpc(BaseAmqpRpc):
             reply_id: str,
             timeout: int,
             msg: AmqpMsg,
+            route: str,
     ) -> RpcResp:
         self._rpc_call_channel.publish(msg)
         future = AsyncResult()
-        self._response_futures[reply_id] = future
+        self._response_futures[reply_id] = (future, route)
         return future.get(timeout=timeout)
 
     def _on_call_message(self, msg: AmqpMsg) -> bool:
@@ -98,10 +99,10 @@ class GeventAmqpRpc(BaseAmqpRpc):
 
     def _on_resp_message(self, msg: AmqpMsg):
         try:
-            future = self._response_futures.pop(msg.correlation_id)
+            (future, route) = self._response_futures.pop(msg.correlation_id)
         except KeyError:
             return True
 
-        resp = self._decode_resp(msg)
+        resp = self._decode_resp(msg, route)
         future.set(resp)
         return True
