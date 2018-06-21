@@ -42,9 +42,9 @@ class BaseAmqpRpc(BaseRpc, metaclass=ABCMeta):
         else:
             self.conn = self._create_conn(params)
 
-        self.stage_setup_name = '3:rpc.setup'
+        self.stage_setup_name = '1:rpc.setup'
         self._stage_setup = None
-        self.stage_listen_name = '5:rpc.listen'
+        self.stage_listen_name = '2:rpc.listen'
         self._stage_listen = None
 
         self._rpc_call_channel = None
@@ -62,7 +62,7 @@ class BaseAmqpRpc(BaseRpc, metaclass=ABCMeta):
         self._create_listen()
         self._create_resp()
 
-    def start(self, auto_reconnect: bool=True, wait: bool=True):
+    def start(self, auto_reconnect: bool=True):
         raise NotImplementedError
 
     def stop(self):
