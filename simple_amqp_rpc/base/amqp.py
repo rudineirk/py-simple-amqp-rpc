@@ -102,16 +102,16 @@ class BaseAmqpRpc(BaseRpc, metaclass=ABCMeta):
     def set_default_encoding(self, encoding: str):
         self._default_encoding = encoding
 
-    def set_call_encoder(self, name: str, call_encoder):
+    def add_call_encoder(self, name: str, call_encoder):
         self._call_encoders[name] = call_encoder
 
-    def set_call_decoder(self, name: str, call_decoder):
+    def add_call_decoder(self, name: str, call_decoder):
         self._call_decoders[name] = call_decoder
 
-    def set_resp_encoder(self, name: str, resp_encoder):
+    def add_resp_encoder(self, name: str, resp_encoder):
         self._resp_encoder[name] = resp_encoder
 
-    def set_resp_decoder(self, name: str, resp_decoder):
+    def add_resp_decoder(self, name: str, resp_decoder):
         self._resp_decoder[name] = resp_decoder
 
     def _send_call_msg(
