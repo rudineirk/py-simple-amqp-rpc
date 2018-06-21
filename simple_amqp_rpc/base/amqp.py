@@ -109,10 +109,10 @@ class BaseAmqpRpc(BaseRpc, metaclass=ABCMeta):
         self._call_decoders[name] = call_decoder
 
     def add_resp_encoder(self, name: str, resp_encoder):
-        self._resp_encoder[name] = resp_encoder
+        self._resp_encoders[name] = resp_encoder
 
     def add_resp_decoder(self, name: str, resp_decoder):
-        self._resp_decoder[name] = resp_decoder
+        self._resp_decoders[name] = resp_decoder
 
     def _send_call_msg(
             self,
