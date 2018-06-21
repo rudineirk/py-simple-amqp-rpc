@@ -50,10 +50,10 @@ class BaseAmqpRpc(BaseRpc, metaclass=ABCMeta):
         self._default_encoding = 'json'
         self._route_encodings = {}
 
-        self.stage_setup_name = '1:rpc.setup'
-        self._stage_setup = None
-        self.stage_listen_name = '2:rpc.listen'
-        self._stage_listen = None
+        self.setup_stage_name = '1:rpc.setup'
+        self.setup_stage = None
+        self.listen_stage_name = '2:rpc.listen'
+        self.listen_stage = None
 
         self._rpc_call_channel = None
         self._rpc_resp_channel = None
@@ -155,18 +155,18 @@ class BaseAmqpRpc(BaseRpc, metaclass=ABCMeta):
         return encoder(resp)
 
     def _configure_stages(self):
-        self._stage_setup = self.conn.stage(self.stage_setup_name)
-        self._stage_listen = self.conn.stage(self.stage_listen_name)
+        self.setup_stage = self.conn.stage(self.setup_stage_name)
+        self.listen_stage = self.conn.stage(self.listen_stage_name)
 
     def _create_publish(self):
-        channel = self.conn.channel(stage=self._stage_setup)
+        channel = self.conn.channel(stage=self.setup_stage)
         for route in self._publish_routes:
             exchange = RPC_EXCHANGE.format(route=route)
             channel.exchange(
                 exchange,
                 'topic',
                 durable=True,
-                stage=self._stage_setup,
+                stage=self.setup_stage,
             )
 
         self._rpc_call_channel = channel
@@ -175,28 +175,28 @@ class BaseAmqpRpc(BaseRpc, metaclass=ABCMeta):
         exchange_name = RPC_EXCHANGE.format(route=self.route)
         queue_name = RPC_QUEUE.format(route=self.route)
 
-        channel = self.conn.channel(stage=self._stage_setup)
+        channel = self.conn.channel(stage=self.setup_stage)
         exchange = channel \
             .exchange(
                 exchange_name,
                 'topic',
                 durable=True,
-                stage=self._stage_setup,
+                stage=self.setup_stage,
             )
         channel \
             .queue(
                 queue_name,
                 auto_delete=True,
-                stage=self._stage_setup,
+                stage=self.setup_stage,
             ) \
             .bind(
                 exchange,
                 RPC_TOPIC,
-                stage=self._stage_setup,
+                stage=self.setup_stage,
             ) \
             .consume(
                 self._on_call_message,
-                stage=self._stage_listen,
+                stage=self.listen_stage,
             )
 
     def _create_resp(self):
@@ -204,13 +204,13 @@ class BaseAmqpRpc(BaseRpc, metaclass=ABCMeta):
         queue = channel.queue(
             auto_delete=True,
             exclusive=True,
-            stage=self._stage_setup,
+            stage=self.setup_stage,
         )
         queue.consume(
             self._on_resp_message,
             auto_ack=True,
             exclusive=True,
-            stage=self._stage_setup,
+            stage=self.setup_stage,
         )
         self._resp_channel = channel
         self._resp_queue = queue.name
