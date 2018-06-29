@@ -180,7 +180,6 @@ class BaseAmqpRpc(BaseRpc, metaclass=ABCMeta):
             .exchange(
                 exchange_name,
                 'topic',
-                durable=True,
                 stage=self.setup_stage,
             )
         channel \
