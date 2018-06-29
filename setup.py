@@ -10,7 +10,7 @@ with open(path.join(basedir, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='simple-amqp-rpc',
-    version='0.3.3',
+    version='0.3.4',
     description='Simple AMQP RPC lib',
     long_description=long_description,
     long_description_content_type='text/markdown',
