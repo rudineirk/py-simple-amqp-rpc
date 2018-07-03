@@ -165,7 +165,6 @@ class BaseAmqpRpc(BaseRpc, metaclass=ABCMeta):
             channel.exchange(
                 exchange,
                 'topic',
-                durable=True,
                 stage=self.setup_stage,
             )
 
